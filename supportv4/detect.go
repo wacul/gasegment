@@ -1,7 +1,8 @@
 package supportv4
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
+
 	"github.com/wacul/gasegment"
 )
 
@@ -34,7 +35,7 @@ func DetectMatchType(stepType gasegment.SequenceStepType) (string, error) {
 	case gasegment.ImmediatelyPrecedes:
 		return MatchTypeImmediatelyPrecedes, nil
 	default:
-		return "", errors.Errorf("unspecified match type: %v", stepType)
+		return "", fmt.Errorf("unspecified match type: %v", stepType)
 	}
 }
 
@@ -60,7 +61,7 @@ func DetectScope(metricScope gasegment.MetricScope) (string, error) {
 	case gasegment.PerUser:
 		return ScopeUser, nil
 	default:
-		return "", errors.Errorf("unspecified scope: %v", metricScope)
+		return "", fmt.Errorf("unspecified scope: %v", metricScope)
 	}
 }
 
@@ -126,7 +127,7 @@ func DetectOperatorOnMetric(op gasegment.Operator) (opStr string, not bool, err 
 	// case gasegment.Regexp:
 	// case gasegment.NotRegexp:
 	default:
-		return "", false, errors.Errorf("unspecified operator on metric %v", op)
+		return "", false, fmt.Errorf("unspecified operator on metric %v", op)
 	}
 }
 
@@ -211,7 +212,7 @@ func DetectOperatorOnDimension(op gasegment.Operator) (opStr string, not bool, e
 	case gasegment.NotRegexp:
 		return OperatorRegexp, true, nil
 	default:
-		return "", false, errors.Errorf("unspecified operator on dimension %v", op)
+		return "", false, fmt.Errorf("unspecified operator on dimension %v", op)
 	}
 }
 
@@ -259,7 +260,7 @@ func DetectFilterType(dm gasegment.DimensionOrMetric) (FilterType, error) {
 		return ftype, err
 	}
 	if ftype == FilterTypeUnspecified {
-		return ftype, errors.Errorf("unspecified filter type %v", dm)
+		return ftype, fmt.Errorf("unspecified filter type %v", dm)
 	}
 	return ftype, nil
 }
