@@ -2,6 +2,7 @@ package supportv4
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/wacul/gasegment"
 )
@@ -226,11 +227,10 @@ const (
 	FilterTypeUnspecified = FilterType("unspecified")
 )
 
-var filterTypeMap map[gasegment.DimensionOrMetric]FilterType
-
-func init() {
+var (
 	filterTypeMap = map[gasegment.DimensionOrMetric]FilterType{}
-}
+	mu            sync.Mutex
+)
 
 // detectFilterType : detects filter type (primitive)
 func detectFilterType(dm gasegment.DimensionOrMetric) (FilterType, error) {
@@ -250,6 +250,9 @@ func detectFilterType(dm gasegment.DimensionOrMetric) (FilterType, error) {
 
 // DetectFilterType : detects filter type
 func DetectFilterType(dm gasegment.DimensionOrMetric) (FilterType, error) {
+	mu.Lock() // for filterTypeMap
+	defer mu.Unlock()
+
 	ftype, ok := filterTypeMap[dm]
 	if ok {
 		return ftype, nil
