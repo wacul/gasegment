@@ -1,9 +1,9 @@
 package supportv4
 
 import (
+	"fmt"
 	"strings"
 
-	"github.com/pkg/errors"
 	"github.com/wacul/gasegment"
 	gapi "google.golang.org/api/analyticsreporting/v4"
 )
@@ -35,7 +35,7 @@ func TransformSegments(segments *gasegment.Segments) (*gapi.DynamicSegment, erro
 			}
 			sessionSegmentFilters = append(sessionSegmentFilters, segmentFilter)
 		default:
-			return nil, errors.Errorf("cannot guess segment scope=%v", segment.Scope)
+			return nil, fmt.Errorf("cannot guess segment scope=%v", segment.Scope)
 		}
 	}
 
@@ -86,7 +86,7 @@ func TransformSegment(segment *gasegment.Segment) (*gapi.DynamicSegment, error) 
 			},
 		}, nil
 	default:
-		return nil, errors.Errorf("cannot guess segment scope=%v", segment.Scope)
+		return nil, fmt.Errorf("cannot guess segment scope=%v", segment.Scope)
 	}
 }
 
@@ -101,7 +101,7 @@ func NewSegmentFilter(segment *gasegment.Segment) (*gapi.SegmentFilter, error) {
 	case gasegment.SequenceSegment:
 		return TransformSequence(&segment.Sequence)
 	default:
-		return nil, errors.Errorf("cannot guess segment type=%v", segment.Type)
+		return nil, fmt.Errorf("cannot guess segment type=%v", segment.Type)
 	}
 }
 
@@ -233,7 +233,7 @@ func TransformExpression(expr *gasegment.Expression) (*gapi.SegmentFilterClause,
 	case FilterTypeMetric:
 		return NewMetricFilterClause(expr)
 	default:
-		return nil, errors.Errorf("cannot guess expression=%v", ftype)
+		return nil, fmt.Errorf("cannot guess expression=%v", ftype)
 	}
 }
 
@@ -251,7 +251,7 @@ func NewDimensionFilterClause(expr *gasegment.Expression) (*gapi.SegmentFilterCl
 		// between operator "<>{minvalue}_{maxvalue}" (see: https://developers.google.com/analytics/devguides/reporting/core/v3/segments?hl=ja)
 		vs := strings.SplitN(expr.Value, "_", 2)
 		if len(vs) != 2 {
-			return nil, errors.Errorf("required format is '<>{min_value}_{max_value}', but %q", expr.Value)
+			return nil, fmt.Errorf("required format is '<>{min_value}_{max_value}', but %q", expr.Value)
 		}
 		return &gapi.SegmentFilterClause{
 			Not: not,
@@ -308,7 +308,7 @@ func NewMetricFilterClause(expr *gasegment.Expression) (*gapi.SegmentFilterClaus
 		// between operator "<>{minvalue}_{maxvalue}" (see: https://developers.google.com/analytics/devguides/reporting/core/v3/segments?hl=ja)
 		vs := strings.SplitN(expr.Value, "_", 2)
 		if len(vs) != 2 {
-			return nil, errors.Errorf("required format is '<>{min_value}_{max_value}', but %q", expr.Value)
+			return nil, fmt.Errorf("required format is '<>{min_value}_{max_value}', but %q", expr.Value)
 		}
 		return &gapi.SegmentFilterClause{
 			Not: not,

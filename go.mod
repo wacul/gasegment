@@ -3,7 +3,6 @@ module github.com/wacul/gasegment
 go 1.18
 
 require (
-	github.com/pkg/errors v0.9.1
 	golang.org/x/net v0.2.0
 	golang.org/x/oauth2 v0.2.0
 	google.golang.org/api v0.103.0

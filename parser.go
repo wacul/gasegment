@@ -1,7 +1,6 @@
 package gasegment
 
 import (
-	"errors"
 	"fmt"
 	"regexp"
 
@@ -65,7 +64,7 @@ func Parse(definition string) (Segments, error) {
 		}
 		if s.Scope.String() == "" {
 			if lastScope.String() == "" {
-				return Segments{}, errors.New("no segment scope (user:: or session::)")
+				return Segments{}, fmt.Errorf("no segment scope (user:: or session::)")
 			}
 			s.Scope = lastScope
 		}
@@ -108,7 +107,7 @@ func parseSegment(definition string) (Segment, error) {
 		}
 		sg.Sequence = sq
 	} else {
-		return sg, errors.New(fmt.Sprintf("unknown segment condition %s", s))
+		return sg, fmt.Errorf(fmt.Sprintf("unknown segment condition %s", s))
 	}
 
 	return sg, nil
@@ -216,13 +215,13 @@ func parseExpression(definition string) (Expression, error) {
 
 	idxes := OpSeparatorRe.FindAllStringIndex(s, -1)
 	if len(idxes) == 0 {
-		return Expression{}, errors.New(fmt.Sprintf("invalid expression: %s", definition))
+		return Expression{}, fmt.Errorf(fmt.Sprintf("invalid expression: %s", definition))
 	}
 	opi := idxes[0]
 
 	e.Target = DimensionOrMetric(s[:opi[0]])
 	if e.Target == "" {
-		return Expression{}, errors.New("empty dimension or metric")
+		return Expression{}, fmt.Errorf("empty dimension or metric")
 	}
 	e.Operator = Operator(s[opi[0]:opi[1]])
 	e.Value = UnEscapeExpressionValue(s[opi[1]:])

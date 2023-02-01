@@ -5,7 +5,6 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/pkg/errors"
 	gapi "google.golang.org/api/analyticsreporting/v4"
 )
 
@@ -37,7 +36,7 @@ func V3StringifyDynamicSegment(node *gapi.DynamicSegment) (string, error) {
 		statements = append(statements, "sessions::"+inner)
 	}
 	if len(statements) <= 0 {
-		return "", errors.New("at least either a session or a user segment")
+		return "", fmt.Errorf("at least either a session or a user segment")
 	}
 	return strings.Join(statements, ";"), nil
 }
@@ -84,7 +83,7 @@ func V3StringifySegmentFilter(node *gapi.SegmentFilter) (string, error) {
 		}
 		return "sequence::" + inner, nil
 	}
-	return "", errors.New("at least either a simple or a sequence segment")
+	return "", fmt.Errorf("at least either a simple or a sequence segment")
 }
 
 // V3StringifySequenceSegment :
@@ -178,7 +177,7 @@ func V3StringifySegmentFilterClause(node *gapi.SegmentFilterClause) (string, err
 	if node.MetricFilter != nil {
 		return V3StringifySegmentMetricFilter(node.MetricFilter, node.Not)
 	}
-	return "", errors.New("must be wither a metric or a dimension filter")
+	return "", fmt.Errorf("must be wither a metric or a dimension filter")
 }
 
 // V3StringifySegmentDimensionFilter :
@@ -193,7 +192,7 @@ func V3StringifySegmentDimensionFilter(node *gapi.SegmentDimensionFilter, not bo
 		op = OperatorRegexp
 	}
 	if len(node.Expressions) == 0 && op != OperatorNumericBetween {
-		return "", errors.New("invalid expression. at least length >= 1")
+		return "", fmt.Errorf("invalid expression. at least length >= 1")
 	}
 	// see also: ./detect.go DetectOperatorOnDimension
 
@@ -254,7 +253,7 @@ func V3StringifySegmentDimensionFilter(node *gapi.SegmentDimensionFilter, not bo
 		maxValue := strings.Replace(node.MaxComparisonValue, "|", `\|`, -1)
 		return fmt.Sprintf("%s%s%s_%s", node.DimensionName, op, minValue, maxValue), nil
 	default:
-		return "", errors.Errorf("unsupported dimension operator: %s", op)
+		return "", fmt.Errorf("unsupported dimension operator: %s", op)
 	}
 }
 
@@ -304,6 +303,6 @@ func V3StringifySegmentMetricFilter(node *gapi.SegmentMetricFilter, not bool) (s
 		}
 		return fmt.Sprintf("%s%s<>%s_%s", scopePrefix, node.MetricName, node.ComparisonValue, node.MaxComparisonValue), nil
 	default:
-		return "", errors.Errorf("unsupported metric operator: %s", op)
+		return "", fmt.Errorf("unsupported metric operator: %s", op)
 	}
 }
